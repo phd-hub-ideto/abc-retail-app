@@ -1,0 +1,96 @@
+# https://github.com/alexkaratarakis/gitattributes
+packages/ -diff
+
+* text=auto
+
+*.dll   binary
+*.doc   binary
+*.docx  binary
+*.exe   binary
+*.fbz7  binary
+*.ldf   binary
+*.mdf   binary
+*.pdb   binary
+*.rtf   binary
+*.vspx  binary
+*.zip   binary
+*.docx  binary
+*.nupkg binary
+*.aip   binary
+
+.gitattributes text eol=crlf
+.gitignore   text eol=crlf
+*.cs         text eol=crlf diff=csharp
+*.css        text eol=crlf diff=css
+*.less       text eol=crlf diff=css
+*.tt         text eol=crlf
+*.t4         text eol=crlf
+*.xml        text eol=crlf
+*.yml        text eol=crlf
+*.json       text eol=crlf
+*.xaml       text eol=crlf
+*.txt        text eol=crlf
+*.xdt        text eol=crlf
+*.xsd        text eol=crlf
+*.svg        text eol=crlf
+*.sms        text eol=crlf
+*.transform  text eol=crlf
+*.ts         text eol=crlf
+*.js         text eol=crlf
+*.sql        text eol=crlf
+*.bat        text eol=crlf
+*.config     text eol=crlf
+*.cshtml     text eol=crlf
+*.ps1        text eol=crlf
+*.sln        text eol=crlf
+*.csproj     text eol=crlf
+*.vbproj     text eol=crlf
+*.vcxproj    text eol=crlf
+*.vcproj     text eol=crlf
+*.dbproj     text eol=crlf
+*.fsproj     text eol=crlf
+*.lsproj     text eol=crlf
+*.wixproj    text eol=crlf
+*.modelproj  text eol=crlf
+*.sqlproj    text eol=crlf
+*.wmaproj    text eol=crlf
+*.vb         text eol=crlf
+*.xproj      text eol=crlf
+*.props      text eol=crlf
+*.filters    text eol=crlf
+*.vcxitems   text eol=crlf
+*.proj       text eol=crlf
+
+*.index text eol=crlf
+*.cache text eol=crlf
+*.resources text eol=crlf
+*.targets text eol=crlf
+*.resx text eol=crlf
+*.ashx text eol=crlf
+*.yml text eol=crlf
+*.conf text eol=crlf
+*.map text eol=crlf
+*.asax text eol=crlf
+*.pubxml text eol=crlf
+*.aspx text eol=crlf
+*.htm text eol=crlf
+*.datasource text eol=crlf
+*.svcinfo text eol=crlf
+*.wsdl text eol=crlf
+*.svcmap text eol=crlf
+*.disco text eol=crlf
+*.settings text eol=crlf
+*.csv text eol=crlf
+*.svc text eol=crlf
+*.manifest text eol=crlf
+*.filters text eol=crlf
+*.html text eol=crlf
+*.asmx text eol=crlf
+*.php text eol=crlf
+*.dbml text eol=crlf
+*.layout text eol=crlf
+*.ini text eol=crlf
+*.testrunconfig text eol=crlf
+*.snippet text eol=crlf
+*.md text eol=crlf
+*.md text eol=crlf

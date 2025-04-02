@@ -1,0 +1,66 @@
+﻿@model Product
+
+@{
+    ViewData["Title"] = "View Product";
+}
+
+<h1 class="text-center mb-4">@Model.Name</h1>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">Product Details</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <strong>Description:</strong>
+                        </div>
+                        <div class="col-md-8">
+                            <p>@Model.Description</p>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <strong>Price:</strong>
+                        </div>
+                        <div class="col-md-8">
+                            <p>R @Model.Price</p>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <strong>Product Image:</strong>
+                        </div>
+                        <div class="col-md-8">
+                            @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                            {
+                                <img src="@Model.ImageUrl" alt="@Model.Name" class="img-fluid rounded" />
+                            }
+                            else
+                            {
+                                <p>No image available</p>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <strong>Product ID:</strong>
+                        </div>
+                        <div class="col-md-8">
+                            <p>@Model.RowKey</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center mt-4">
+                <a href="/Product/Index" class="btn btn-secondary">Back to Product List</a>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,36 @@
+﻿@model Product
+
+@{
+    ViewData["Title"] = "Create Product";
+}
+
+<h1>Create Product</h1>
+
+<form method="post" enctype="multipart/form-data" action="/Product/AddProduct" class="needs-validation" novalidate>
+    <div class="mb-3">
+        <label for="Name" class="form-label">Product Name</label>
+        <input asp-for="Name" class="form-control" id="Name" required />
+        <div class="invalid-feedback">Please enter the product name.</div>
+    </div>
+
+    <div class="mb-3">
+        <label for="Description" class="form-label">Description</label>
+        <textarea asp-for="Description" class="form-control" id="Description" rows="3" required></textarea>
+        <div class="invalid-feedback">Please provide a product description.</div>
+    </div>
+
+    <div class="mb-3">
+        <label for="Price" class="form-label">Price</label>
+        <input asp-for="Price" type="number" class="form-control" id="Price" step="0.01" required />
+        <div class="invalid-feedback">Please enter a valid product price.</div>
+    </div>
+
+    <div class="mb-3">
+        <label for="Image" class="form-label">Product Image</label>
+        <input type="file" class="form-control" id="Image" name="Image" />
+    </div>
+
+    <div class="mb-3">
+        <button type="submit" class="btn btn-primary">Create Product</button>
+    </div>
+</form>

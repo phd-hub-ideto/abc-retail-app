@@ -1,0 +1,26 @@
+﻿@model IEnumerable<QueueMessageViewModel>
+
+
+<h2>Queue Messages</h2>
+<a asp-action="SendMessage">Send New Message</a>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Message ID</th>
+            <th>Content</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var message in Model)
+        {
+            <tr>
+                <td>@message.MessageId</td>
+                <td>@message.Content</td>
+                <td>
+                    <a asp-action="DeleteMessage" asp-route-messageId="@message.MessageId" asp-route-popReceipt="@message.PopReceipt">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

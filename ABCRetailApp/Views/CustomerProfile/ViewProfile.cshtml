@@ -1,0 +1,74 @@
+﻿@model CustomerProfile
+
+@{
+    ViewData["Title"] = "View Customer Profile";
+}
+
+<h1 class="text-center mb-4">Customer Profile: @Model.FullName</h1>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">Profile Details</h4>
+                </div>
+                <div class="card-body">
+                    <!-- Full Name -->
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <strong>Full Name:</strong>
+                        </div>
+                        <div class="col-md-8">
+                            <p>@Model.FullName</p>
+                        </div>
+                    </div>
+
+                    <!-- Email -->
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <strong>Email:</strong>
+                        </div>
+                        <div class="col-md-8">
+                            <p>@Model.Email</p>
+                        </div>
+                    </div>
+
+                    <!-- Phone Number -->
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <strong>Phone Number:</strong>
+                        </div>
+                        <div class="col-md-8">
+                            <p>@Model.Phone</p>
+                        </div>
+                    </div>
+
+                    <!-- Address -->
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <strong>Address:</strong>
+                        </div>
+                        <div class="col-md-8">
+                            <p>@Model.Address</p>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <strong>Customer ID:</strong>
+                        </div>
+                        <div class="col-md-8">
+                            <p>@Model.RowKey</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Back Button -->
+            <div class="text-center mt-4">
+                <a href="/CustomerProfile/Index" class="btn btn-secondary">Back to Customer List</a>
+            </div>
+        </div>
+    </div>
+</div>

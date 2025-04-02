@@ -1,0 +1,23 @@
+﻿@model IEnumerable<FileShareItem>
+
+<h2>Download File</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>File Name</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var file in Model)
+        {
+            <tr>
+                <td>@file.FileName</td>
+                <td>
+                    <a asp-action="Download" asp-route-fileName="@file.FileName" class="btn btn-primary">Download</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
