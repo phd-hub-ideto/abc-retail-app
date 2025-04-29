@@ -93,3 +93,5 @@ appsettings*.json
 # Publish Profile
 /ABCRetailApp/Properties/PublishProfiles
 /ABCRetailApp/Properties/ServiceDependencies
+/ABCRetailFunctions/Properties/PublishProfiles
+/ABCRetailFunctions/Properties/ServiceDependencies

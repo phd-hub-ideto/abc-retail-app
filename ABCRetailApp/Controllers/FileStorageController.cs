@@ -1,49 +1,88 @@
-﻿using ABCRetailApp.Services;
+﻿using ABCRetailApp.Models;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.Json;
 
 namespace ABCRetailApp.Controllers;
 
 public class FileStorageController : Controller
 {
-    private readonly AzureFileStorageService _fileStorageService;
+    private readonly IConfiguration _configuration;
 
-    public FileStorageController(AzureFileStorageService fileStorageService)
+    public FileStorageController(IConfiguration configuration)
     {
-        _fileStorageService = fileStorageService;
+        _configuration = configuration;
     }
 
     public async Task<IActionResult> Index()
     {
-        var files = await _fileStorageService.ListFilesAsync();
+        var functionUrl = $"{_configuration.GetValue<string>(Constants.FunctionsBaseUrl)}/api/file/list";
+
+        using var client = new HttpClient();
+
+        var response = await client.GetAsync(functionUrl);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            return View(new List<FileShareItem>());
+        }
+
+        var json = await response.Content.ReadAsStringAsync();
+
+        var files = JsonSerializer.Deserialize<List<FileShareItem>>(json, Constants.SharedJsonSerializerOptions);
+
         return View(files);
     }
 
-    public IActionResult Upload()
-    {
-        return View();
-    }
+    public IActionResult Upload() => View();
 
     [HttpPost]
     public async Task<IActionResult> Upload(IFormFile file)
     {
         if (file != null)
         {
-            using var stream = file.OpenReadStream();
-            await _fileStorageService.UploadFileAsync(file.FileName, stream);
+            var functionUrl = $"{_configuration.GetValue<string>(Constants.FunctionsBaseUrl)}/api/file/upload";
+
+            using var content = new MultipartFormDataContent
+            {
+                { new StreamContent(file.OpenReadStream()), "file", file.FileName }
+            };
+
+            using var client = new HttpClient();
+
+            await client.PostAsync(functionUrl, content);
+
             return RedirectToAction(nameof(Index));
         }
+
         return View();
     }
 
     public async Task<IActionResult> Download(string fileName)
     {
-        var stream = await _fileStorageService.DownloadFileAsync(fileName);
+        var functionUrl = $"{_configuration.GetValue<string>(Constants.FunctionsBaseUrl)}/api/file/download/{fileName}";
+
+        using var client = new HttpClient();
+
+        var response = await client.GetAsync(functionUrl);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            return RedirectToAction(nameof(Index));
+        }
+
+        var stream = await response.Content.ReadAsStreamAsync();
+
         return File(stream, "application/octet-stream", fileName);
     }
 
     public async Task<IActionResult> Delete(string fileName)
     {
-        await _fileStorageService.DeleteFileAsync(fileName);
+        var functionUrl = $"{_configuration.GetValue<string>(Constants.FunctionsBaseUrl)}/api/file/delete/{fileName}";
+
+        using var client = new HttpClient();
+
+        await client.DeleteAsync(functionUrl);
+
         return RedirectToAction(nameof(Index));
     }
 }

@@ -11,7 +11,7 @@ namespace ABCRetailApp
             // Add services to the container.
             builder.Services.AddSingleton<AzureTableService>();
             builder.Services.AddSingleton<AzureBlobService>();
-            
+
             //New Services
             builder.Services.AddSingleton<AzureQueueStorageService>();
             builder.Services.AddSingleton<AzureFileStorageService>();

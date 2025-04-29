@@ -1,21 +1,37 @@
 ﻿using ABCRetailApp.Models;
 using ABCRetailApp.Services;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.Json;
 
 namespace ABCRetailApp.Controllers;
 
 public class QueueStorageController : Controller
 {
-    private readonly AzureQueueStorageService _queueStorageService;
+    private readonly IConfiguration _configuration;
 
-    public QueueStorageController(AzureQueueStorageService queueStorageService)
+    public QueueStorageController(
+        IConfiguration configuration)
     {
-        _queueStorageService = queueStorageService;
+        _configuration = configuration;
     }
 
     public async Task<IActionResult> Index()
     {
-        var messages = await _queueStorageService.ReceiveMessagesAsync();
+        using var client = new HttpClient();
+
+        var functionUrl = $"{_configuration.GetValue<string>(Constants.FunctionsBaseUrl)}/api/queue/receive";
+
+        var response = await client.GetAsync(functionUrl);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            return View(new List<QueueMessageViewModel>());
+        }
+
+        var content = await response.Content.ReadAsStringAsync();
+
+        var messages = JsonSerializer.Deserialize<List<QueueMessage>>(content, Constants.SharedJsonSerializerOptions);
+
         var viewModel = messages.Select(m => new QueueMessageViewModel
         {
             MessageId = m.MessageId,
@@ -25,7 +41,6 @@ public class QueueStorageController : Controller
 
         return View(viewModel);
     }
-
 
     public IActionResult SendMessage()
     {
@@ -37,9 +52,17 @@ public class QueueStorageController : Controller
     {
         if (!string.IsNullOrWhiteSpace(message))
         {
-            await _queueStorageService.SendMessageAsync(message);
+            using var client = new HttpClient();
+
+            var functionUrl = $"{_configuration.GetValue<string>(Constants.FunctionsBaseUrl)}/api/queue/send";
+
+            var content = new StringContent(message, System.Text.Encoding.UTF8, "text/plain");
+
+            await client.PostAsync(functionUrl, content);
+
             return RedirectToAction(nameof(Index));
         }
+
         return View();
     }
 
@@ -52,7 +75,22 @@ public class QueueStorageController : Controller
     [HttpPost]
     public async Task<IActionResult> DeleteMessageConfirmed(string messageId, string popReceipt)
     {
-        await _queueStorageService.DeleteMessageAsync(messageId, popReceipt);
+        using var client = new HttpClient();
+
+        var functionUrl = $"{_configuration.GetValue<string>(Constants.FunctionsBaseUrl)}/api/queue/delete";
+
+        var json = new DeleteMessageModel
+        {
+            MessageId = messageId,
+            PopReceipt = popReceipt
+        };
+
+        var payload = JsonSerializer.Serialize(json);
+
+        var content = new StringContent(payload, System.Text.Encoding.UTF8, "application/json");
+
+        await client.PostAsync(functionUrl, content);
+
         return RedirectToAction(nameof(Index));
     }
 }

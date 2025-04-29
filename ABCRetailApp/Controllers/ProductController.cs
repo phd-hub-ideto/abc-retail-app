@@ -1,6 +1,7 @@
 ﻿using ABCRetailApp.Models;
 using ABCRetailApp.Services;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.Json;
 
 namespace ABCRetailApp.Controllers;
 
@@ -8,11 +9,16 @@ public class ProductController : Controller
 {
     private readonly AzureTableService _azureTableService;
     private readonly AzureBlobService _azureBlobService;
+    private readonly IConfiguration _configuration;
 
-    public ProductController(AzureTableService azureTableService, AzureBlobService azureBlobService)
+    public ProductController(
+        AzureTableService azureTableService,
+        AzureBlobService azureBlobService,
+        IConfiguration configuration)
     {
         _azureTableService = azureTableService;
         _azureBlobService = azureBlobService;
+        _configuration = configuration;
     }
 
     public async Task<IActionResult> Index()
@@ -34,32 +40,54 @@ public class ProductController : Controller
     {
         if (ModelState.IsValid)
         {
+            using var client = new HttpClient();
+            HttpResponseMessage response;
+
+            string functionUrl = string.Empty;
+
             // Retrieve the image from the request directly
             var image = Request.Form.Files.GetFile("Image");
 
             // Generate a unique file name for the image
             if (image != null)
             {
-                var fileName = Guid.NewGuid().ToString() + Path.GetExtension(image.FileName);
+                using var content = new MultipartFormDataContent();
+                using var stream = image.OpenReadStream();
 
-                // Upload the image to Blob Storage
-                using (var stream = image.OpenReadStream())
+                content.Add(new StreamContent(stream), "file", image.FileName);
+
+                functionUrl = $"{_configuration.GetValue<string>(Constants.FunctionsBaseUrl)}/api/uploadimage";
+
+                response = await client.PostAsync(functionUrl, content);
+
+                if (!response.IsSuccessStatusCode)
                 {
-                    await _azureBlobService.UploadImageAsync(stream, fileName);
+                    ModelState.AddModelError(string.Empty, "Image upload failed.");
+
+                    return View("Create", product);
                 }
 
-                // Save the image URL in the product
-                product.ImageUrl = $"https://{_azureBlobService.GetBlobContainerClient().AccountName}.blob.core.windows.net/{_azureBlobService.GetContainerName()}/{fileName}";
+                var imageUrl = await response.Content.ReadAsStringAsync();
+
+                product.ImageUrl = imageUrl.Trim('"'); // Remove quotes from JSON string
             }
 
-            // Set PartitionKey and RowKey for the product
-            product.PartitionKey = "product";  // You can adjust based on your requirements
-            product.RowKey = Guid.NewGuid().ToString(); // Unique identifier for the product
+            functionUrl = $"{_configuration.GetValue<string>(Constants.FunctionsBaseUrl)}/api/storeproduct";
 
-            // Add the product to Azure Table
-            await _azureTableService.AddProductAsync(product);
+            var productJson = JsonSerializer.Serialize(product);
 
-            return RedirectToAction("Index");
+            var productContent = new StringContent(productJson, System.Text.Encoding.UTF8, "application/json");
+
+            response = await client.PostAsync(functionUrl, productContent);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return RedirectToAction("Index");
+            }
+
+            var error = await response.Content.ReadAsStringAsync();
+
+            ModelState.AddModelError(string.Empty, $"Error storing product: {error}");
         }
 
         return View("Create", product);
@@ -69,7 +97,7 @@ public class ProductController : Controller
     public async Task<IActionResult> ViewProduct(string partitionKey, string rowKey)
     {
         var product = await _azureTableService.GetProductAsync(partitionKey, rowKey);
-        
+
         return View(product);
     }
 
